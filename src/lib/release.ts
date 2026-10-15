@@ -59,8 +59,11 @@ async function resolveSha256(
 
 function hashFromNotes(body: string): string | null {
   const lines = body.split(/\r?\n/)
-  // Prefer the line that names the universal APK, not one of the split APKs.
-  const preferred = lines.find((line) => /\bdipi\.apk(?![.\w])/.test(line))
+  // Prefer a checksum line that names the universal APK and actually carries a
+  // hash — a changelog entry that only mentions the file name must not win.
+  const preferred = lines.find(
+    (line) => /\bdipi\.apk(?![.\w])/.test(line) && SHA256_RE.test(line),
+  )
   const source = preferred ?? lines.find((line) => SHA256_RE.test(line))
   const match = source?.match(SHA256_RE)
   return match ? match[0].toLowerCase() : null
