@@ -1,0 +1,139 @@
+{
+  "screens": [
+    {
+      "id": "1-calendar-paid",
+      "title": "تقویم — روز پرداخت‌شده",
+      "alt": "تقویم شمسی دیپی با یک روز کاری پرداخت‌شده انتخاب شده و کارت همان روز باز است.",
+      "files": {
+        "dark": {
+          "540": "1-calendar-paid-dark-540.webp",
+          "1080": "1-calendar-paid-dark-1080.webp"
+        },
+        "light": {
+          "540": "1-calendar-paid-light-540.webp",
+          "1080": "1-calendar-paid-light-1080.webp"
+        }
+      }
+    },
+    {
+      "id": "2-calendar-pending",
+      "title": "تقویم — روز در انتظار",
+      "alt": "تقویم شمسی دیپی با یک روز کاری در انتظار دستمزد انتخاب شده و جزئیات همان روز دیده می‌شود.",
+      "files": {
+        "dark": {
+          "540": "2-calendar-pending-dark-540.webp",
+          "1080": "2-calendar-pending-dark-1080.webp"
+        },
+        "light": {
+          "540": "2-calendar-pending-light-540.webp",
+          "1080": "2-calendar-pending-light-1080.webp"
+        }
+      }
+    },
+    {
+      "id": "3-add-workday",
+      "title": "ثبت روزکار",
+      "alt": "فرم ثبت روزکار تازه در دیپی، با تاریخ شمسی و محل‌های پیشنهادی.",
+      "files": {
+        "dark": {
+          "540": "3-add-workday-dark-540.webp",
+          "1080": "3-add-workday-dark-1080.webp"
+        },
+        "light": {
+          "540": "3-add-workday-light-540.webp",
+          "1080": "3-add-workday-light-1080.webp"
+        }
+      }
+    },
+    {
+      "id": "4-employers",
+      "title": "فهرست کارفرماها",
+      "alt": "فهرست کارفرماها با شش عدد کارکرد، ساعت، دستمزد و پرداخت روی هر کارت.",
+      "files": {
+        "dark": {
+          "540": "4-employers-dark-540.webp",
+          "1080": "4-employers-dark-1080.webp"
+        },
+        "light": {
+          "540": "4-employers-light-540.webp",
+          "1080": "4-employers-light-1080.webp"
+        }
+      }
+    },
+    {
+      "id": "5-employer-detail",
+      "title": "جزئیات کارفرما",
+      "alt": "صفحهٔ یک کارفرما با مانده‌حساب، آمار و فهرست روزکارها.",
+      "files": {
+        "dark": {
+          "540": "5-employer-detail-dark-540.webp",
+          "1080": "5-employer-detail-dark-1080.webp"
+        },
+        "light": {
+          "540": "5-employer-detail-light-540.webp",
+          "1080": "5-employer-detail-light-1080.webp"
+        }
+      }
+    },
+    {
+      "id": "6-payments",
+      "title": "فهرست پرداخت‌ها",
+      "alt": "فهرست پرداخت‌ها با جمع دریافتی، فیلتر کارفرما و نوع پرداخت.",
+      "files": {
+        "dark": {
+          "540": "6-payments-dark-540.webp",
+          "1080": "6-payments-dark-1080.webp"
+        },
+        "light": {
+          "540": "6-payments-light-540.webp",
+          "1080": "6-payments-light-1080.webp"
+        }
+      }
+    },
+    {
+      "id": "7-add-payment",
+      "title": "ثبت پرداخت",
+      "alt": "فرم ثبت پرداخت تازه با نوع دستمزد، علی‌الحساب یا بازپرداخت هزینه.",
+      "files": {
+        "dark": {
+          "540": "7-add-payment-dark-540.webp",
+          "1080": "7-add-payment-dark-1080.webp"
+        },
+        "light": {
+          "540": "7-add-payment-light-540.webp",
+          "1080": "7-add-payment-light-1080.webp"
+        }
+      }
+    },
+    {
+      "id": "8-stats",
+      "title": "آمار",
+      "alt": "صفحهٔ آمار با نمودار ماهانه و کارت حساب هر کارفرما.",
+      "files": {
+        "dark": {
+          "540": "8-stats-dark-540.webp",
+          "1080": "8-stats-dark-1080.webp"
+        },
+        "light": {
+          "540": "8-stats-light-540.webp",
+          "1080": "8-stats-light-1080.webp"
+        }
+      }
+    },
+    {
+      "id": "9-settings",
+      "title": "تنظیمات و پشتیبان",
+      "alt": "صفحهٔ تنظیمات روی بخش پشتیبان‌گیری و خروجی فایل.",
+      "files": {
+        "dark": {
+          "540": "9-settings-dark-540.webp",
+          "1080": "9-settings-dark-1080.webp"
+        },
+        "light": {
+          "540": "9-settings-light-540.webp",
+          "1080": "9-settings-light-1080.webp"
+        }
+      }
+    }
+  ]
+}

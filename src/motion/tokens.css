@@ -1,0 +1,12 @@
+:root {
+  --motion-fast: 200ms;
+  --motion-in: 500ms;
+  --motion-wipe: 900ms;
+  --motion-underline: 600ms;
+  --motion-stagger: 60ms;
+  --motion-hero-cycle: 5s;
+  --motion-blob: 26s;
+  --motion-shine: 6s;
+  --motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}

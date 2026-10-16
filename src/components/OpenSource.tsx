@@ -38,7 +38,7 @@ function LinkCard({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 rounded-xl border border-ink-700 bg-ink-800/60 px-4 py-3 text-sm font-medium text-paper transition-colors hover:border-teal-400 hover:text-teal-300"
+      className="inline-flex items-center gap-2 rounded-2xl border border-ink-700 bg-ink-800/50 px-4 py-3 text-sm font-medium text-paper shadow-[inset_0_1px_0_rgb(255_255_255/0.05)] transition-colors hover:border-teal-400 hover:text-teal-300"
     >
       <Icon aria-hidden="true" size={18} />
       {label}

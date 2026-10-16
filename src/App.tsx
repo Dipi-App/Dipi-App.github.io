@@ -1,4 +1,3 @@
-import { Developer } from './components/Developer'
 import { Download } from './components/Download'
 import { Features } from './components/Features'
 import { Footer } from './components/Footer'
@@ -16,6 +15,7 @@ export default function App() {
 
   return (
     <>
+      <div className="site-grain" aria-hidden="true" />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:end-3 focus:z-50 focus:rounded-lg focus:bg-gold-400 focus:px-4 focus:py-2 focus:font-semibold focus:text-ink-950"
@@ -30,7 +30,6 @@ export default function App() {
         <Download release={release} />
         <InstallGuide release={release} />
         <OpenSource />
-        <Developer />
       </main>
       <Footer />
     </>

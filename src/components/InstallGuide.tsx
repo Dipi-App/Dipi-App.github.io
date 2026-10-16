@@ -1,7 +1,7 @@
 import { AlertTriangle, Hash } from 'lucide-react'
 import { fa } from '../content/fa'
 import { toPersianDigits } from '../lib/persian'
-import type { ReleaseState } from '../lib/release'
+import type { ApkVariant, ReleaseState } from '../lib/release'
 import { Section } from './Section'
 
 interface InstallGuideProps {
@@ -10,18 +10,16 @@ interface InstallGuideProps {
 
 export function InstallGuide({ release }: InstallGuideProps) {
   const { install } = fa
-  // Only show the hash check when a real hash could be retrieved from the release.
-  const sha256 = release.status === 'ready' ? release.release.sha256 : null
+  const hashed =
+    release.status === 'ready' ? release.release.variants.filter((variant) => variant.sha256) : []
 
   return (
     <Section id="install" title={install.title} subtitle={install.subtitle}>
-      <ol className="grid gap-4 sm:grid-cols-3">
+      <ol className="install-steps">
         {install.steps.map((step, index) => (
-          <li key={step.title} className="rounded-2xl border border-ink-700 bg-ink-800/60 p-5">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gold-400 font-bold text-ink-950">
-              {toPersianDigits(index + 1)}
-            </span>
-            <h3 className="mt-3 text-base font-semibold text-paper">{step.title}</h3>
+          <li key={step.title} className="install-step">
+            <span className="install-step-num">{toPersianDigits(index + 1)}</span>
+            <h3 className="mt-3 text-base font-semibold text-pretty text-paper">{step.title}</h3>
             <p className="mt-2 text-sm leading-7 text-muted">{step.description}</p>
           </li>
         ))}
@@ -32,19 +30,35 @@ export function InstallGuide({ release }: InstallGuideProps) {
         <p className="text-sm leading-7 text-paper">{install.warningNote}</p>
       </div>
 
-      {sha256 ? (
+      {hashed.length > 0 ? (
         <div className="mt-6 rounded-xl border border-teal-400/40 bg-teal-500/10 p-4">
           <h3 className="flex items-center gap-2 font-semibold text-teal-300">
             <Hash aria-hidden="true" size={18} />
             {install.sha.title}
           </h3>
           <p className="mt-2 text-sm leading-7 text-muted">{install.sha.description}</p>
-          <code className="mt-3 block break-all rounded-lg bg-ink-950/70 px-3 py-2 font-mono text-xs text-paper">
-            {sha256}
-          </code>
-          <p className="mt-2 text-sm leading-7 text-muted">{install.sha.match}</p>
+          <ul className="mt-3 grid gap-3">
+            {hashed.map((variant) => (
+              <ShaRow key={variant.id} variant={variant} />
+            ))}
+          </ul>
+          <p className="mt-3 text-sm leading-7 text-muted">{install.sha.match}</p>
         </div>
       ) : null}
     </Section>
+  )
+}
+
+function ShaRow({ variant }: { variant: ApkVariant }) {
+  const copy = fa.download.variants[variant.id]
+  return (
+    <li>
+      <p className="text-xs text-muted">
+        {copy.title} ({copy.abi})
+      </p>
+      <code className="mt-1 block break-all rounded-lg bg-ink-950/70 px-3 py-2 font-mono text-xs text-paper">
+        {variant.sha256}
+      </code>
+    </li>
   )
 }

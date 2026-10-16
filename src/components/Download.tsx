@@ -1,8 +1,16 @@
-import { Download as DownloadIcon } from 'lucide-react'
 import { fa } from '../content/fa'
 import { links } from '../lib/links'
 import { formatFileSize, formatJalaliDate, toPersianDigits } from '../lib/persian'
-import type { ReleaseState } from '../lib/release'
+import {
+  type ApkVariant,
+  type ApkVariantId,
+  fallbackVariants,
+  type ReleaseState,
+  VARIANT_IDS,
+  variantOf,
+} from '../lib/release'
+import { AudienceNote } from './AudienceNote'
+import { DownloadButton } from './DownloadButton'
 import { Section } from './Section'
 
 interface DownloadProps {
@@ -13,38 +21,70 @@ export function Download({ release }: DownloadProps) {
   const { download } = fa
   return (
     <Section id="download" title={download.title} subtitle={download.subtitle}>
-      <div className="rounded-2xl border border-ink-700 bg-ink-800/60 p-6 sm:p-8">
-        <a
-          href={links.apkDownload}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gold-400 px-6 py-3 text-base font-bold text-ink-950 transition-colors hover:bg-gold-300 sm:w-auto"
-        >
-          <DownloadIcon aria-hidden="true" size={20} />
-          {download.button}
-        </a>
-        <p className="mt-3 text-sm text-muted">{download.directLinkNote}</p>
+      <div className="download-shell">
+        <div className="download-island">
+          <AudienceNote title={fa.hero.badge} body={download.audienceNote} />
+          <p className="mt-5 max-w-2xl leading-8 text-muted">{download.choose}</p>
 
-        <ReleaseDetails release={release} />
+          <ApkGrid release={release} />
+          <ReleaseMeta release={release} />
 
-        <a
-          href="#install"
-          className="mt-6 inline-flex items-center gap-2 text-teal-300 underline underline-offset-4 hover:text-teal-400"
-        >
-          {download.installGuideLink}
-        </a>
+          <a href="#install" className="download-guide-link">
+            {download.installGuideLink}
+          </a>
+        </div>
       </div>
     </Section>
   )
 }
 
-interface DetailRow {
-  readonly label: string
-  readonly value: string
-  readonly mono?: boolean
+function ApkGrid({ release }: { release: ReleaseState }) {
+  const variants = variantsFor(release)
+
+  return (
+    <ul className="apk-grid">
+      {VARIANT_IDS.map((id) => (
+        <li key={id}>
+          <ApkCard id={id} variant={variants[id]} />
+        </li>
+      ))}
+    </ul>
+  )
 }
 
-function ReleaseDetails({ release }: { release: ReleaseState }) {
+function ApkCard({ id, variant }: { id: ApkVariantId; variant: ApkVariant }) {
+  const copy = fa.download.variants[id]
+  const size = variant.sizeBytes ? formatFileSize(variant.sizeBytes) : null
+  const direct = variant.url !== links.releasesLatest
+  const primary = id === 'universal'
+
+  return (
+    <article className="apk-card">
+      <p className="apk-card-abi">{copy.abi}</p>
+      <h3 className="apk-card-title">{copy.title}</h3>
+      <p className="apk-card-devices">{copy.devices}</p>
+      {size ? (
+        <p className="apk-card-size">
+          <span className="text-muted">{fa.download.sizeLabel}</span>
+          <strong className="tabular-nums">{size}</strong>
+        </p>
+      ) : null}
+      <div className="mt-auto pt-4">
+        <DownloadButton href={variant.url} wide tone={primary ? 'primary' : 'secondary'}>
+          {direct ? copy.button : fa.download.openRelease}
+        </DownloadButton>
+      </div>
+      {variant.sha256 ? (
+        <p className="apk-card-sha">
+          <span>{fa.download.shaLabel}</span>
+          <code>{variant.sha256}</code>
+        </p>
+      ) : null}
+    </article>
+  )
+}
+
+function ReleaseMeta({ release }: { release: ReleaseState }) {
   const { download } = fa
 
   if (release.status === 'loading') {
@@ -59,28 +99,31 @@ function ReleaseDetails({ release }: { release: ReleaseState }) {
     return <p className="mt-6 text-sm text-muted">{download.unavailable}</p>
   }
 
-  const { version, publishedAt, apkSizeBytes, sha256 } = release.release
-  const rows: DetailRow[] = []
-  if (version) rows.push({ label: download.versionLabel, value: toPersianDigits(version) })
-  if (apkSizeBytes) rows.push({ label: download.sizeLabel, value: formatFileSize(apkSizeBytes) })
+  const { version, publishedAt } = release.release
   const date = publishedAt ? formatJalaliDate(publishedAt) : ''
+  const rows: { label: string; value: string }[] = []
+  if (version) rows.push({ label: download.versionLabel, value: toPersianDigits(version) })
   if (date) rows.push({ label: download.releasedLabel, value: date })
-  if (sha256) rows.push({ label: download.shaLabel, value: sha256, mono: true })
 
-  if (rows.length === 0) {
-    return <p className="mt-6 text-sm text-muted">{download.unavailable}</p>
-  }
+  if (rows.length === 0) return null
 
   return (
-    <dl className="mt-6 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+    <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
       {rows.map((row) => (
-        <div key={row.label} className="flex flex-col gap-1 border-b border-ink-700/60 pb-2">
+        <div key={row.label} className="flex flex-col gap-1">
           <dt className="text-xs text-muted">{row.label}</dt>
-          <dd className={row.mono ? 'break-all font-mono text-xs text-paper' : 'text-paper'}>
-            {row.value}
-          </dd>
+          <dd className="tabular-nums text-paper">{row.value}</dd>
         </div>
       ))}
     </dl>
   )
+}
+
+function variantsFor(release: ReleaseState): Record<ApkVariantId, ApkVariant> {
+  if (release.status !== 'ready') return fallbackVariants()
+  return {
+    universal: variantOf(release.release, 'universal'),
+    v8: variantOf(release.release, 'v8'),
+    v7: variantOf(release.release, 'v7'),
+  }
 }

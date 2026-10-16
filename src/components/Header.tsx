@@ -1,4 +1,10 @@
+import { type MouseEvent, useEffect, useState } from 'react'
 import { fa } from '../content/fa'
+
+function closeMobileNav(event: MouseEvent<HTMLAnchorElement>) {
+  const root = event.currentTarget.closest('details')
+  if (root) root.open = false
+}
 
 const NAV_LINKS = [
   { href: '#features', label: fa.nav.features },
@@ -9,10 +15,19 @@ const NAV_LINKS = [
 ] as const
 
 export function Header() {
+  const [stuck, setStuck] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setStuck(window.scrollY > 24)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
-    <header className="sticky top-0 z-20 border-b border-ink-700/70 bg-ink-900/85 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
-        <a href="#top" className="flex items-center gap-2 rounded-lg">
+    <header className={`site-header${stuck ? ' is-stuck' : ''}`}>
+      <div className="site-header-island">
+        <a href="#top" className="site-brand">
           <img
             src="/logo.png"
             alt=""
@@ -21,19 +36,34 @@ export function Header() {
             decoding="async"
             className="h-8 w-8 rounded-lg"
           />
-          <span className="text-lg font-bold text-paper">{fa.nav.brand}</span>
+          <span className="text-base font-bold text-paper">{fa.nav.brand}</span>
         </a>
-        <nav aria-label={fa.nav.ariaLabel} className="ms-auto">
-          <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+        <nav aria-label={fa.nav.ariaLabel} className="nav-desktop">
+          <ul className="flex items-center gap-1 text-sm">
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
-                <a href={link.href} className="rounded text-muted hover:text-gold-300">
+                <a href={link.href} className="nav-link">
                   {link.label}
                 </a>
               </li>
             ))}
           </ul>
         </nav>
+        <a href="#download" className="header-cta">
+          {fa.nav.download}
+        </a>
+        <details className="nav-mobile">
+          <summary className="nav-mobile-summary">{fa.nav.menu}</summary>
+          <ul className="nav-mobile-list">
+            {NAV_LINKS.map((link) => (
+              <li key={link.href}>
+                <a href={link.href} className="nav-link" onClick={closeMobileNav}>
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </details>
       </div>
     </header>
   )
