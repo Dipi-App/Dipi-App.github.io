@@ -29,6 +29,7 @@ interface GitHubAsset {
   readonly name: string
   readonly size: number
   readonly browser_download_url: string
+  readonly digest?: string | null
 }
 
 interface GitHubRelease {
@@ -68,35 +69,16 @@ function pickAbi(assets: readonly GitHubAsset[], abi: string): GitHubAsset | und
   return assets.find((asset) => isApk(asset.name) && asset.name.includes(abi))
 }
 
-function shaAssetFor(assets: readonly GitHubAsset[], apkName: string): GitHubAsset | undefined {
-  return assets.find((asset) => asset.name === `${apkName}.sha256`)
-}
-
 /**
- * The GitHub Releases API has no dedicated SHA-256 field. We read the hash from
- * the published `*.apk.sha256` asset, and only fall back to the release notes
- * when a clearly valid 64-hex hash is present there. We never guess or compute
- * the hash in the browser.
+ * GitHub publishes each release asset's digest in the API. Older releases may
+ * not have one, so fall back to a clearly valid 64-hex hash in the notes. The
+ * `.sha256` assets cannot be fetched from the browser: GitHub sends no CORS
+ * header for release downloads. We never guess or compute the hash here.
  */
-async function resolveSha256(
-  assets: readonly GitHubAsset[],
-  apkName: string,
-  body: string,
-  signal: AbortSignal,
-): Promise<string | null> {
-  const shaAsset = shaAssetFor(assets, apkName)
-  if (shaAsset) {
-    try {
-      const response = await fetch(shaAsset.browser_download_url, { signal })
-      if (response.ok) {
-        const match = (await response.text()).match(SHA256_RE)
-        if (match) return match[0].toLowerCase()
-      }
-    } catch {
-      // Fall through to the release notes.
-    }
-  }
-  return hashFromNotes(body, apkName)
+function sha256Of(asset: GitHubAsset, body: string): string | null {
+  const digest = asset.digest?.trim().toLowerCase() ?? ''
+  const hex = digest.startsWith('sha256:') ? digest.slice(7) : digest
+  return /^[a-f0-9]{64}$/.test(hex) ? hex : hashFromNotes(body, asset.name)
 }
 
 function hashFromNotes(body: string, apkName: string): string | null {
@@ -115,7 +97,6 @@ function fallbackVariant(id: ApkVariantId): ApkVariant {
 async function buildVariants(
   assets: readonly GitHubAsset[],
   body: string,
-  signal: AbortSignal,
 ): Promise<readonly ApkVariant[]> {
   const picked: Record<ApkVariantId, GitHubAsset | undefined> = {
     universal: pickUniversal(assets),
@@ -131,7 +112,7 @@ async function buildVariants(
         id,
         url: asset.browser_download_url,
         sizeBytes: asset.size,
-        sha256: await resolveSha256(assets, asset.name, body, signal),
+        sha256: sha256Of(asset, body),
       }
     }),
   )
@@ -180,7 +161,7 @@ export function useLatestRelease(): ReleaseState {
             tag: data.tag_name ?? '',
             version: (data.tag_name ?? '').replace(/^v/, ''),
             publishedAt: data.published_at ?? '',
-            variants: await buildVariants(assets, data.body ?? '', controller.signal),
+            variants: await buildVariants(assets, data.body ?? ''),
           },
         })
       } catch (error) {
